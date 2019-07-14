@@ -90,7 +90,10 @@ class PanFireStoreDB(AbstractPanDB):
         # If we don't have an object or a ref, look up from server.
         if obj is None:
             collection = getattr(self, collection)
-            obj = next(collection.order_by('date').limit(1).stream()).to_dict()
+            try:
+                obj = next(collection.order_by('date').limit(1).stream()).to_dict()
+            except StopIteration:
+                obj = None
 
         if isinstance(obj, firestore.DocumentReference):
             # Pull from server.
