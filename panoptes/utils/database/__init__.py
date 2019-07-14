@@ -28,6 +28,7 @@ def _get_db_class(module_name='file'):
         'mongo': 'PanMongoDB',
         'file': 'PanFileDB',
         'memory': 'PanMemoryDB',
+        'firestore': 'PanFireStoreDB',
     }
 
     full_module_name = f'panoptes.utils.database.{module_name}'
