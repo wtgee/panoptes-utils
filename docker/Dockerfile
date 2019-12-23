@@ -35,7 +35,7 @@ RUN apt-get update && \
     cat "${PANDIR}/panoptes-utils/docker/zshrc" >> /etc/skel/.zshrc && \
     # Astrometry folders
     mkdir -p /astrometry/ && \
-    echo "add_path ${PANDIR}/astrometry/data" >> /etc/astrometry.cfg
+    echo "add_path /astrometry/" >> /etc/astrometry.cfg
 
 WORKDIR ${PANDIR}/panoptes-utils
 

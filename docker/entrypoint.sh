@@ -14,16 +14,6 @@ if ! test -f "$SSH_KEY"; then
     gosu panoptes ssh-keygen -q -t rsa -N "" -f "${SSH_KEY}"
 fi
 
-# Update home permissions
-chown -R ${USER_ID}:${USER_ID} $HOME
-
-# We always want to update the requirements because it is assumed the container
-# will run with the local directory mapped and that may have changed.
-if test -f requirements.txt; then
-    gosu panoptes pip install --no-cache-dir -q -r requirements.txt
-    gosu panoptes pip install --no-cache-dir -q -e .
-fi
-
 METADATA_URL='http://metadata.google.internal/computeMetadata/v1/project/attributes'
 
 # Authenticate if key has been set - used on local units
@@ -45,8 +35,24 @@ if [ ! -z ${GOOGLE_COMPUTE_INSTANCE} ]; then
 
     echo "Starting Cloud SQL proxy"
     python ${PANDIR}/panoptes-utils/scripts/connect_cloud_sql_proxy.py \
-        --config="${HOME}/.cloud-sql-conf.yaml" \
-        --verbose &
+        --config="${HOME}/.cloud-sql-conf.yaml" &
+fi
+
+# Update home permissions
+chown -R ${USER_ID}:${USER_ID} $HOME
+
+if test -d /app; then
+    chown -R ${USER_ID}:${USER_ID} /app
+fi
+
+# We always want to update the requirements because it is assumed the container
+# will run with the local directory mapped and that may have changed.
+if test -f requirements.txt; then
+    gosu panoptes pip install --no-cache-dir -q -r requirements.txt
+fi
+
+if test -f setup.py; then
+    gosu panoptes pip install --no-cache-dir -q -e .
 fi
 
 # Pass arguments
