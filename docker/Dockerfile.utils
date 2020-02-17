@@ -1,6 +1,6 @@
 ARG arch=amd64
 
-FROM gcr.io/panoptes-survey/panoptes-base:$arch AS base-image
+FROM gcr.io/panoptes-exp/panoptes-base:$arch AS base-image
 MAINTAINER Developers for PANOPTES project<https://github.com/panoptes/POCS>
 
 ARG arch=amd64
@@ -35,8 +35,9 @@ RUN cd && \
     python panoptes/utils/data.py \
         --wide-field --narrow-field \
         --folder /astrometry/ && \
+    chmod -R a+r /astrometry && \
     # Cleanup apt.
-    apt-get autoremove --purge -y git gcc pkg-config && \
+    apt-get autoremove --purge -y gcc pkg-config && \
     apt-get autoremove --purge -y && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/*
