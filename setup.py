@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 # Licensed under an MIT style license - see LICENSE.txt
 
-from panoptes.utils.version import __version__
+from configparser import ConfigParser
 from setuptools import setup, find_namespace_packages
 
 import itertools
 
-from configparser import ConfigParser
-from distutils.command.build_py import build_py
-
-import builtins
-builtins._PANOPTES_SETUP_ = True
+import versioneer
 
 
 # Get some values from the setup.cfg
@@ -28,21 +24,17 @@ NAME = metadata.get('name', 'panoptes-utils')
 PACKAGENAME = metadata.get('package_name', 'packagename')
 URL = metadata.get('url', 'https://projectpanoptes.org')
 
-requirements = list()
-requirements_fn = 'requirements.txt'
-with open(requirements_fn) as f:
-    requirements = f.read().splitlines()
-
 modules = {
-    'google': ['google-cloud-storage', 'psycopg2-binary'],
     'required': [
-        'astroplan',
-        'astropy',
+        'astroplan>=0.6',
+        'astropy>=4.0.0',
         'Flask',
+        'loguru',
         'matplotlib>=3.0.0',
         'numpy',
         'photutils',
         'pyserial',
+        'python-json-logger',
         'python-dateutil',
         'PyYAML',
         'pyzmq',
@@ -50,6 +42,7 @@ modules = {
         'scalpl',
         'scikit-image',
         'scipy',
+        'versioneer'
     ],
     'social': ['requests', 'tweepy'],
     'testing': [
@@ -57,8 +50,8 @@ modules = {
         'coverage',
         'coveralls',
         'mocket',
-        'pycodestyle==2.3.1',
-        'pytest>=3.6',
+        'pycodestyle',
+        'pytest',
         'pytest-cov',
         'pytest-remotedata>=0.3.1'
     ],
@@ -66,7 +59,8 @@ modules = {
 
 
 setup(name=NAME,
-      version=__version__,
+      version=versioneer.get_version(),
+      cmdclass=versioneer.get_cmdclass(),
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
       author=AUTHOR,
@@ -77,10 +71,6 @@ setup(name=NAME,
       python_requires='>=3.6',
       setup_requires=['pytest-runner'],
       tests_require=modules['testing'],
-      # List additional groups of dependencies here (e.g. development
-      # dependencies). You can install these using the following syntax,
-      # for example:
-      # $ pip install -e .[dev,test]
       scripts=[
           'bin/cr2-to-jpg',
           'bin/panoptes-config-server',
@@ -108,5 +98,4 @@ setup(name=NAME,
           'Topic :: Scientific/Engineering :: Astronomy',
           'Topic :: Scientific/Engineering :: Physics',
       ],
-      cmdclass={'build_py': build_py}
       )
