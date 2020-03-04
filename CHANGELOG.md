@@ -32,6 +32,7 @@ First big overhaul of the repository. Pulls in features that were duplicated or 
 ### Added
 * Config Server
   * See the description in the [README](README.md#id11)
+* [Versioneer](https://github.com/warner/python-versioneer) for version strings (#123).
 
 ### Bug fixes
 * IERS Mirror (#65, #67)
