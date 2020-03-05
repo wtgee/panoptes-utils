@@ -60,3 +60,4 @@ fi
 
 # Pass arguments
 exec gosu panoptes "$@"
+
