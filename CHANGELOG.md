@@ -6,16 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - [Changelog](#changelog)
-  - [[Unreleased]](#unreleased)
+  - [[0.2.3] - 2020-03-08](#023---2020-03-08)
+    - [Bug fixes](#bug-fixes)
     - [Changed](#changed)
+    - [Removed](#removed)
+  - [[0.2.2] - 2020-03-05](#022---2020-03-05)
+    - [Bug fixes](#bug-fixes)
+    - [Changed](#changed)
+    - [Removed](#removed)
   - [[0.2.0] - 2020-03-04](#020---2020-03-04)
     - [Added](#added)
-    - [Bug fixes](#bug-fixes)
+    - [Bug fixes](#bug-fixes-1)
     - [Changed](#changed-1)
   - [[0.1.0] - 2020-03-04](#010---2020-03-04)
   - [[0.0.8] - 2019-06-29](#008---2019-06-29)
     - [Added](#added-1)
-    - [Bug fixes](#bug-fixes-1)
+    - [Bug fixes](#bug-fixes-2)
     - [Changed](#changed-2)
   - [[0.0.7] - 2019-05-26](#007---2019-05-26)
     - [Added](#added-2)
@@ -27,10 +33,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - [Added](#added-4)
     - [Changed](#changed-5)
 
-## [Unreleased]
+## [0.2.3]
+
+Small point release to correct namespace and remove some bloat.
 
 ### Changed
+
+* Fixed top-level namespace so we can have other `panoptes` repos. (#137)
+
+### Removed
+
+* Dependencies that will be deprecated soon and are causing bloat: `photutils`, `scikit-image`. (#138)
+
+## [0.2.2] - 2020-03-05
+
+Mostly some cleanup from the `v0.2.0` release based on integrating all the changes into POCS.
+
+### Bug fixes
+
+* Misc bugs introduced as part of last release, including to `download-data.py` script.
+* Custom exceptions now properly pass `kwargs` through to parent (#135).
+
+### Changed
+
 * New script for downloading data, `scripts/download-data.py`. This helped resolve some issues with the relative imports introduced in `v0.2.0` and is cleaner. (#129)
+* All dependencies are smashed into one "feature" in `setup.py` to make `pip-tools` work well. This will fix the docker image problems introduced in `v0.2.1`. (#136)
+
+### Removed
+
+* The `get_root_logger` and associated tests (#134).
 
 ## [0.2.0] - 2020-03-04
 

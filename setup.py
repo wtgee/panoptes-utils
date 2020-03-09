@@ -4,8 +4,6 @@
 from configparser import ConfigParser
 from setuptools import setup, find_namespace_packages
 
-import itertools
-
 import versioneer
 
 
@@ -28,32 +26,35 @@ modules = {
     'required': [
         'astroplan>=0.6',
         'astropy>=4.0.0',
+        'codecov',  # testing
+        'coverage',  # testing
+        'coveralls',  # testing
         'Flask',
         'loguru',
         'matplotlib>=3.0.0',
+        'mocket',  # testing
         'numpy',
-        'photutils',
+        'pycodestyle',  # testing
         'pyserial',
+        'pytest',  # testing
+        'pytest-cov',  # testing
+        'pytest-remotedata>=0.3.1',  # testing
         'python-dateutil',
         'PyYAML',
         'pyzmq',
+        'requests',  # social
         'ruamel.yaml>=0.15',
         'scalpl',
-        'scikit-image',
         'scipy',
-        'versioneer'
+        'tweepy',  # social
+        'versioneer',
     ],
-    'social': ['requests', 'tweepy'],
-    'testing': [
-        'codecov',
-        'coverage',
-        'coveralls',
-        'mocket',
-        'pycodestyle',
-        'pytest',
-        'pytest-cov',
-        'pytest-remotedata>=0.3.1'
-    ],
+    'extras': {
+        'dev': [
+            'photutils',
+            'scikit-image',
+        ]
+    }
 }
 
 
@@ -69,7 +70,7 @@ setup(name=NAME,
       keywords=KEYWORDS,
       python_requires='>=3.6',
       setup_requires=['pytest-runner'],
-      tests_require=modules['testing'],
+      tests_require=modules['required'],
       scripts=[
           'bin/cr2-to-jpg',
           'bin/panoptes-config-server',
@@ -77,12 +78,9 @@ setup(name=NAME,
           'bin/panoptes-solve-field',
       ],
       install_requires=modules['required'],
-      extras_require={
-          'social': modules['social'],
-          'testing': modules['testing'],
-          'all': list(set(itertools.chain.from_iterable(modules.values())))
-      },
-      packages=find_namespace_packages(exclude=['tests', 'test_*']),
+      extras_require=modules['extras'],
+      packages=find_namespace_packages(include=['panoptes.*'],
+                                       exclude=['tests', 'test_*']),
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Environment :: Console',
