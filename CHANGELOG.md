@@ -2,7 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.dev11]
+## [0.2.12] - 2020-04-29
+
+Quick release to get the `panoptes.utils.sources` into the package.
+
+### Bug fixes
+
+* `panoptes.utils.sources` not included in package. (#187, #188)
+
+### Changed
+
+* Ability to pass credentials to underlying google client functions. (#187)
+
+## [0.2.11] - 2020-04-29
 
 ### Added
 
@@ -46,6 +58,7 @@ All notable changes to this project will be documented in this file.
 
 FITS Utils removals (#173):
     * Removing unused and confusing `improve_wcs`.
+PanLogger class moved to POCS. (#186)
 
 ## [0.2.10] - 2020-04-13
 

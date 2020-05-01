@@ -16,12 +16,12 @@ from .. import listify
 from ..logger import logger
 
 
-def _get_firestore_client(project_id='panoptes-exp', database='(default)'):
+def _get_firestore_client(project_id='panoptes-exp', database='(default)', credentials=AnonymousCredentials()):
     logger.debug(f'Getting new firestore client')
     firestore_client = firestore.Client(
         project=project_id,
         database=database,
-        credentials=AnonymousCredentials()
+        credentials=credentials
     )
     return firestore_client
 
@@ -32,46 +32,29 @@ def get_metadata(image_id=None, sequence_id=None, fields=None, firestore_client=
     This function is capable of searching one type of object at a time, which is
     specified via the respective id parameter.
 
-    #TODO(wtgee): Setup firestore emulator for testing.
+    #TODO(wtgee): Setup firestore emulator for testing. #179
 
     >>> from panoptes.utils.data import get_metadata
     >>> # Get image metadata as a DataFrame with one record.
     >>> image_id = 'PAN001_14d3bd_20181204T134406'
     >>> image_df = get_metadata(image_id=image_id)
-    >>> image_df.to_dict(orient='record')
-    [{'airmass': 1.448405572358143,
-      'bucket_path': 'PAN001/14d3bd/20181204T133735/20181204T134406.fits.fz',
-      'dec_image': -5.41566868893,
-      'dec_mnt': -5.39111,
-      'exptime': 59.9,
-      'ha_mnt': 2.663025317826093,
-      'image_id': 'PAN001_14d3bd_20181204T134406',
-      'moonfrac': 0.08026499021211647,
-      'moonsep': 30.44217250032207,
-      'ra_image': 83.8304932884,
-      'ra_mnt': 83.82207999999999,
-      'received_time': Timestamp('2020-04-17 09:16:20.371000+0000', tz='UTC'),
-      'sequence_id': 'PAN001_14d3bd_20181204T133735',
-      'status': 'received',
-      'time': Timestamp('2018-12-04 13:44:06+0000', tz='UTC'),
-      'unit_id': 'PAN001'}]
     >>> type(image_df)
     <class 'pandas.core.frame.DataFrame'>
+    >>> # This can easily be saved to csv or cast to dict.
+    >>> image_metadata = image_df.to_dict(orient='record')[0]
+    >>> image_metadata['status']
+    'solved'
+    >>> image_metadata['received_time']
+    Timestamp('2020-04-17 09:16:20.371000+0000', tz='UTC')
 
     >>> # Get all image metadata for the observation.
     >>> sequence_id = 'PAN001_14d3bd_20181119T131353'
-    >>> observation = get_metadata(sequence_id=sequence_id)
-    >>> observation.describe()
-             airmass  dec_image   dec_mnt  ...    moonsep   ra_image    ra_mnt
-    count  40.000000  40.000000  40.00000  ...  40.000000  40.000000  40.00000
-    mean    1.335805  -5.390427  -5.39111  ...  37.878005  83.815345  83.82208
-    std     0.133423   0.002305   0.00000  ...   0.014893   0.009459   0.00000
-    min     1.161770  -5.393899  -5.39111  ...  37.853242  83.798776  83.82208
-    25%     1.221510  -5.392543  -5.39111  ...  37.865554  83.807101  83.82208
-    50%     1.309247  -5.389900  -5.39111  ...  37.877977  83.815334  83.82208
-    75%     1.434251  -5.388331  -5.39111  ...  37.890434  83.824132  83.82208
-    max     1.611507  -5.386972  -5.39111  ...  37.902877  83.831588  83.82208
-    ...
+    >>> observation_df = get_metadata(sequence_id=sequence_id)
+    >>> type(observation_df)
+    <class 'pandas.core.frame.DataFrame'>
+    >>> len(observation_df)
+    40
+
     >>> # It's also possible to request certain fields
     >>> airmass_df = get_metadata(sequence_id=sequence_id, fields=['airmass'])
     >>> airmass_df.head()
@@ -245,12 +228,12 @@ def search_observations(
     >>> search_results.groupby(['unit_id', 'field_name']).num_images.sum()
     unit_id  field_name
     PAN001   FlameNebula    436
-             M42            421
+             M42            422
     PAN006   M42             40
              Wasp 35         69
     Name: num_images, dtype: Int64
     >>> search_results.total_minutes_exptime.sum()
-    1420.0
+    1422.0
 
     Args:
         ra (float|None): The RA position in degrees of the center of search.
