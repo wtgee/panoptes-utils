@@ -1,7 +1,10 @@
-ARG base_image=python:3.8-slim-buster
+ARG IMAGE_URL=ubuntu
 
-FROM $base_image AS base-image
-MAINTAINER Developers for PANOPTES project<https://github.com/panoptes/POCS>
+FROM ${IMAGE_URL} AS base-image
+LABEL description="Installs the panoptes-utils module from pip. \
+Used as a production image, e.g. for running panoptes-network items."
+LABEL maintainers="developers@projectpanoptes.org"
+LABEL repo="github.com/panoptes/panoptes-utils"
 
 ARG panuser=panoptes
 ARG userid=1000
@@ -22,14 +25,16 @@ ENV POCS $pocs_dir
 ENV PATH "/home/${PANUSER}/.local/bin:$PATH"
 ENV SOLVE_FIELD /usr/bin/solve-field
 
-# For now we copy from local - can have bad effects if in wrong branch
 COPY docker/zshrc /tmp
+COPY ./scripts/download-data.py /tmp/download-data.py
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         gosu wget curl bzip2 ca-certificates zsh openssh-client nano \
         astrometry.net sextractor dcraw exiftool libcfitsio-dev libcfitsio-bin imagemagick \
-        libfreetype6-dev libpng-dev fonts-lato libsnappy-dev \
+        libfreetype6-dev libpng-dev fonts-lato libsnappy-dev libjpeg-dev \
+        python3-pip python3-scipy python3-dev python3-pandas python3-matplotlib \
+        libffi-dev libssl-dev \
         gcc git pkg-config sudo && \
     # Oh My ZSH. :)
     mkdir -p "${ZSH_CUSTOM}" && \
@@ -54,29 +59,35 @@ RUN apt-get update && \
     # Update permissions for current user.
     chown -R ${PANUSER}:${PANUSER} "/home/${panuser}" && \
     chown -R ${PANUSER}:${PANUSER} ${PANDIR} && \
-    # Astrometry folders
+    # astrometry.net folders
     mkdir -p "${astrometry_dir}" && \
-    chown -R ${PANUSER}:${PANUSER} ${astrometry_dir} && \
-    echo "add_path ${astrometry_dir}" >> /etc/astrometry.cfg
-
-# Can't seem to get around the hard-coding the owner:group
-COPY ./requirements.txt /tmp/requirements.txt
-# First deal with pip and PyYAML - see https://github.com/pypa/pip/issues/5247
-RUN pip install --no-cache-dir --no-deps --ignore-installed pip PyYAML && \
-    pip install --no-cache-dir -r /tmp/requirements.txt
-
-# Install module
-COPY . ${PANDIR}/panoptes-utils/
-RUN cd ${PANDIR}/panoptes-utils && \
-    python setup.py develop && \
-    # Download astrometry.net files
-    python scripts/download-data.py \
+    echo "add_path ${astrometry_dir}" >> /etc/astrometry.cfg && \
+    # Preinstall some modules.
+    pip3 install astropy astroplan click loguru && \
+    # astrometry.net index files
+    python3 /tmp/download-data.py \
         --wide-field --narrow-field \
         --folder "${astrometry_dir}" \
-        --verbose
+        --verbose && \
+    chown -R ${PANUSER}:${PANUSER} ${astrometry_dir} && \
+    chmod -R 777 ${astrometry_dir} && \
+    # Allow sudo without password
+    echo "$PANUSER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# Cleanup apt.
-RUN apt-get autoremove --purge -y gcc pkg-config && \
+# Install module
+COPY . "${PANDIR}/panoptes-utils"
+RUN cd "${PANDIR}/panoptes-utils" && \
+    pip3 install ".[testing,google]" && \
+    # Cleanup
+    apt-get autoremove --purge -y \
+        autoconf \
+        automake \
+        autopoint \
+        build-essential \
+        gcc \
+        gettext \
+        libtool \
+        pkg-config && \
     apt-get autoremove --purge -y && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/*

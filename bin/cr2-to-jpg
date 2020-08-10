@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+set -e
 
 usage() {
   echo -n "##################################################
@@ -20,7 +21,7 @@ usage() {
 "
 }
 
-if [ $# -eq 0 ]; then
+if [[ $# -eq 0 ]]; then
     usage
     exit 1
 fi
@@ -52,6 +53,12 @@ else
         echo "Can't find either exiftool or dcraw, cannot proceed"
         exit 1
     fi
+fi
+
+# Test for file
+if [[ ! -s "${JPG}" ]]; then
+    echo "JPG was not extracted successfully."
+    exit 1
 fi
 
 if [[ -n "$TITLE" ]]

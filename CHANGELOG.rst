@@ -2,16 +2,105 @@
 Changelog
 =========
 
-All notable changes to this project will be documented in this file.
+0.2.22 - 2020-07-25
+-------------------
 
-0.2.16dev
----------
+Changed
+^^^^^^^
+
+* Changed `dir` to `directory` in disk space check. (#226)
+* Pass the git folder to the build context when making local docker images. (#226)
+
+0.2.21 - 2020-07-05
+-------------------
+
+Added
+^^^^^
+
+* Added `arm64` build for Docker based off `ubuntu` image. (#223)
+
+Changed
+^^^^^^^
+
+* Docker
+
+  * Changed base image to `ubuntu`. (#223)
+  * `amd64` and `arm64` images built by default. (#223)
+  * Ubuntu has changed `sextractor` to `source-extractor` (yay). (#223)
+
+* Config Server
+
+  * Better parsing of directories entry in config server. (#222)
+  * Make config server less noisy. (#222)
+
+* Bump PyYaml to latest for security warning. (#222)
+* Remove pendulum because too hard to build on `arm processors <https://github.com/sdispater/pendulum/issues/457>`_. (#223)
+
+
+0.2.20 - 2020-06-09
+-------------------
+
+Moving to python 3.8.
+
+Changed
+^^^^^^^
+
+* **Breaking** Python minimum version changed to ``3.8``. (#217)
+* Running pytest locally will generate coverage report in terminal. (#218)
+* Lots of documentation. (#218)
+* Removing the environment section from the readme. (#218)
+* Config Server (#217)
+
+  * Better logging.
+  * Cleaning up doctests.
+  * Removing all dynamic server items from this repo as they are not needed.
+  * Wait for config_server to start.
+  * Fixing starting within fixture.
+  * Config items no longer assume any defaults for either directories or files. A config file name is always required and it should always be an absolute path. (#218)
+  * Adding test file for config items. (#218)
+  * ``panoptes-config-server`` re-worked and now includes ``run``, ``get``, and ``set`` subcomamnds. (#221)
+
+* Testing (#218)
+
+  * Log files are rotated for each testing run.
+  * Fix env vars (mostly need to make sure the `export` option exists in the `env` file.
+  * Pytest commands moved to `setup.cfg` instead of `run-tests.sh`
+  * Remove old markers
+  * Setting `--strict-markers` options.
+  * Add `astrometry` marker for tests requiring solve and `theskyx` marker for running alongside TheSkyX.
+  * Coverage reports generated in xml and output in terminal.
+
+* Serializers update. (#217)
+
+  * Make the parsing and serializing functions public.
+  * Use pendulum for parsing times instead of astropy Time.
+  * Better naming of public functions. (#218)
+
+
+0.2.19 - 2020-06-04
+-------------------
+
+Straight past ``0.2.19``.
+
+
+Changed
+^^^^^^^
+
+* Removed `bin/panoptes-config-server` and created an entry_point in ``setup.cfg``. (#212)
+* Removed old developer items in favor of those in ``panoptes-pocs``. (#212)
+* Consolidate docker files, consistent naming with other repos. (#210, #212)
+
+0.2.17 - 2020-05-30
+-------------------
+
+`0.2.16` was released with an error and this is a hotfix.
 
 Added
 ^^^^^
 
 * Added CR2 file testing to GitHub Actions. (#125, #205)
 * A `wait_for_events` generic utility, mostly pulled from POCS. (#92, #206)
+  * Supports single `callback` that can be used for interrupting, custom logging, etc. (#208)
 
 Changed
 ^^^^^^^
